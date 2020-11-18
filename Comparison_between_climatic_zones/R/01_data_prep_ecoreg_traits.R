@@ -78,8 +78,22 @@ reshape2::dcast(test, ID_AQEM + KoppenClas + SecKC ~ key_col)
 
 
 
+# Loading data
+traits_full <- read.csv("traits_koppen_wide.csv")
 
 
+# Subset 1:  ID_AQEM  KoppenClas  SecKC  Ecoregions
+eco_subs <- select(traits_full, ID_AQEM, grep("ER", names(traits_full)), ecoregion, KoppenClas, SecKC, key_col)
 
+# Subset 2: Taxonom. Info + Merkmale + Ecoregions + ID_AQEM
+traits_sub <- select(traits_full, -grep("ER", names(traits_full)), -key_col, -KoppenClas,-SecKC, -grep("prim",names(traits_full)))
 
+# Koppen Geiger Classification Data
+classifications <- read.table(file="koppen_geiger/Klimaklassifikationen_Koppen_Geiger.txt", sep=",", header=TRUE)
+
+# Loading ecoregions with confidence data
+conf <- read.dbf("ecoregions/Ecoregions.dbf", as.is=FALSE)
+
+# Adding confidence data to Subset 1
+eco_sub <- base::merge(eco_subs, conf[,c(5,11)], by.x="ecoregion", by.y="NAME")
 
